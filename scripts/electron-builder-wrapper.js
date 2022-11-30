@@ -56,7 +56,10 @@ const runBuilder = function (wrapperConfig, target) {
         throw new Error(`Signing NSIS build requires CSC_LINK or WIN_CSC_LINK`);
     }
     const platformFlag = getPlatformFlag();
-    let allArgs = [platformFlag, target.name];
+    let allArgs = [platformFlag];
+    if (target.name) {
+        allArgs.push(target.name);
+    }
     if (target.platform === 'darwin') {
         allArgs.push(`--c.mac.type=${wrapperConfig.mode === 'dist' ? 'distribution' : 'development'}`);
         if (target.name === 'mas-dev') {
@@ -144,6 +147,9 @@ const calculateTargets = function (wrapperConfig) {
             console.log(`skipping target "${availableTargets.macAppStore.name}" because code-signing is disabled`);
         }
         targets.push(availableTargets.macDirectDownload);
+        break;
+    case 'linux':
+        targets.push({name: ''});
         break;
     default:
         throw new Error(`Could not determine targets for platform: ${process.platform}`);
